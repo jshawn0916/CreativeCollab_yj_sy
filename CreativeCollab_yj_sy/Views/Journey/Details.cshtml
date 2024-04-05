@@ -1,0 +1,49 @@
+﻿@model CreativeCollab_yj_sy.Models.ViewModels.DetailJourney
+@{
+    ViewBag.Title = "Details";
+}
+
+
+<h2 style="margin-bottom:32px;">@Model.JourneyDto.JourneyName</h2>
+<div style="margin-bottom:12px">Description: @Model.JourneyDto.JourneyDescription</div>
+<div class="mb-3">
+    <h4>Connected Restaurants</h4>
+    <table class="border" style="width: 100%;">
+        <thead>
+            <tr class="bg-light">
+                <th style="padding:10px; width: 100%">Restaurant Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Restaurant in Model.RestaurantList)
+            {
+                <tr>
+                    <td style="padding:10px;">
+                        <a style="text-decoration:none; color:black;" href="/Restaurant/Details/@Restaurant.RestaurantID">@Restaurant.RestaurantName</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="mb-5">
+    <h4>Connected Destinations</h4>
+    <table class="border" style="width: 100%;">
+        <thead>
+            <tr class="bg-light">
+                <th style="padding:10px; width: 100%">Restaurant Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var Destination in Model.DestinationList)
+            {
+                <tr>
+                    <td style="padding:10px;">
+                        <a style="text-decoration:none; color:black;" href="/Destination/Details/@Destination.DestinationID">@Destination.DestinationName</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<a style="margin-top:24px" class="btn btn-light border border-1" href="/Journey/List">Go back to Journey List</a>

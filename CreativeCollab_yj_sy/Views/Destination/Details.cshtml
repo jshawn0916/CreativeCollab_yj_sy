@@ -1,0 +1,11 @@
+﻿@model CreativeCollab_yj_sy.Models.DestinationDto
+@{
+    ViewBag.Title = "Details";
+}
+
+
+<h2 style="margin-bottom:32px;">@Model.DestinationName</h2>
+<div style="margin-bottom:12px">Description: @Model.DestinationDescription</div>
+<div>Location: @Model.Location</div>
+
+<a style="margin-top:24px" class="btn btn-light border border-1" href="/Destination/List">Go back to Destination List</a>

@@ -1,0 +1,38 @@
+﻿@model CreativeCollab_yj_sy.Models.ExternalLoginConfirmationViewModel
+@{
+    ViewBag.Title = "등록";
+}
+<main aria-labelledby="title">
+    <h2 id="title">@ViewBag.Title.</h2>
+    <h3>@ViewBag.LoginProvider 계정을 연결합니다.</h3>
+
+    @using (Html.BeginForm("ExternalLoginConfirmation", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <h4>연결 양식</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <p class="text-info">
+            사용자가 <strong>@ViewBag.LoginProvider</strong>.
+            아래에 이 사이트의 사용자 이름을 입력하고 등록 단추를 클릭하여 로그인을
+            완료하세요.
+        </p>
+        <div class="row">
+            @Html.LabelFor(m => m.Email, new { @class = "col-md-2 col-form-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="row">
+            <div class="offset-md-2 col-md-10">
+                <input type="submit" class="btn btn-outline-dark" value="등록" />
+            </div>
+        </div>
+    }
+</main>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

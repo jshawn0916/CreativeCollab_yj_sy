@@ -1,0 +1,20 @@
+﻿@model CreativeCollab_yj_sy.Models.DestinationDto
+@{
+    ViewBag.Title = "DeleteConfirm";
+}
+
+<h2 style="margin-bottom:32px;" class="text-danger mb-5">Are you sure you want to delete this Destination?</h2>
+
+<div>
+    <h3>Name: @Model.DestinationName</h3>
+    <p>Description: @Model.DestinationDescription</p>
+    <p>Location: @Model.Location</p>
+</div>
+
+
+<div style="display:flex; margin-top:30px;">
+    <a href="/Destination/List" style="margin-right:24px" class="btn btn-light border border-1">Cancel</a>
+    <form action="/Destination/Delete/@Model.DestinationID" method="POST">
+        <input type="submit" value="Delete" class="btn btn-danger" />
+    </form>
+</div>

@@ -1,0 +1,22 @@
+﻿@{
+    ViewBag.Title = "New";
+}
+
+<h2 style="margin-bottom:32px;">Create Restaurant</h2>
+<form action="/Restaurant/Create" method="POST">
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name:</label> <input type="text" name="RestaurantName" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Rate:</label> <input type="number" name="Rate" step="0.01" min="0" max="10" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Location:</label> <input type="text" name="Location" />
+    </div>
+    <div class="mb-5">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Description:</label> <textarea name="RestaurantDescription"></textarea>
+    </div>
+    <div>
+        <input class="btn btn-light border border-1" type="submit" value="Create Destination" />
+    </div>
+</form>

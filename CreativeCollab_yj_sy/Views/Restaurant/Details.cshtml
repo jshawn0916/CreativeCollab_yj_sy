@@ -1,0 +1,12 @@
+﻿@model CreativeCollab_yj_sy.Models.RestaurantDto
+@{
+    ViewBag.Title = "Details";
+}
+
+
+<h2 style="margin-bottom:32px;">@Model.RestaurantName</h2>
+<div>Rate: @Model.Rate</div>
+<div>Location: @Model.Location</div>
+<div style="margin-bottom:12px">Description: @Model.RestaurantDescription</div>
+
+<a style="margin-top:24px" class="btn btn-light border border-1" href="/Restaurant/List">Go back to Restaurant List</a>

@@ -1,0 +1,24 @@
+﻿@model CreativeCollab_yj_sy.Models.RestaurantDto
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2 style="margin-bottom:32px;">Update Restaurant</h2>
+<form action="/Restaurant/Update/@Model.RestaurantID" method="POST">
+    <input type="hidden" name="RestaurantID" value="@Model.RestaurantID" />
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name:</label> <input type="text" name="RestaurantName" value="@Model.RestaurantName" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Rate:</label> <input type="number" name="Rate" value="@Model.Rate" step="0.01" min="0" max="10" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Location:</label> <input type="text" name="Location" value="@Model.Location" />
+    </div>
+    <div class="mb-5">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Description:</label> <textarea name="RestaurantDescription">@Model.RestaurantDescription</textarea>
+    </div>
+    <div>
+        <input class="btn btn-light border border-1" type="submit" value="Update Restaurant" />
+    </div>
+</form>

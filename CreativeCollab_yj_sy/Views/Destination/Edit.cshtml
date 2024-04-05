@@ -1,0 +1,21 @@
+﻿@model CreativeCollab_yj_sy.Models.DestinationDto
+@{
+    ViewBag.Title = "Edit";
+}
+
+<h2 style="margin-bottom:32px;">Update Destination</h2>
+<form action="/Destination/Update/@Model.DestinationID" method="POST">
+    <input type="hidden" name="DestinationID" value="@Model.DestinationID" />
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name:</label> <input type="text" name="DestinationName" value="@Model.DestinationName" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Location:</label> <input type="text" name="Location" value="@Model.Location" />
+    </div>
+    <div class="mb-5">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Description:</label> <textarea type="text" name="DestinationDescription">@Model.DestinationDescription</textarea>
+    </div>
+    <div>
+        <input class="btn btn-light border border-1" type="submit" value="Update Destination" />
+    </div>
+</form>
