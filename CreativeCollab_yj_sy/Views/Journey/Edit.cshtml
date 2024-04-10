@@ -1,0 +1,45 @@
+﻿@model CreativeCollab_yj_sy.Models.ViewModels.EditJourney
+@{
+    ViewBag.Title = "New";
+}
+
+<h2 style="margin-bottom:32px;">Update Journey</h2>
+<form action="/Journey/Update/@Model.SeletedJourney.JourneyID" method="POST">
+    <input type="hidden" name="JourneyID" value="@Model.SeletedJourney.JourneyID" />
+    <input type="hidden" name="UserID" value="@Model.SeletedJourney.UserID" />
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name:</label> <input type="text" name="JourneyName" value="@Model.SeletedJourney.JourneyName" />
+    </div>
+    <div class="mb-2">
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Description:</label> <textarea name="JourneyDescription">@Model.SeletedJourney.JourneyDescription</textarea>
+    </div>
+    <div class="mb-2">
+        <h4>Select the Restaurants to connect.</h4>
+        @foreach (var restaurant in Model.RestaurantList)
+        {
+            <div>
+                <label>
+                    <input type="checkbox" name="RestaurantIds" value="@restaurant.RestaurantID"
+                           @(Model.JourneyRestaurant.Any(R => R.RestaurantID == restaurant.RestaurantID) ? "checked" : "") />
+                    @restaurant.RestaurantName
+                </label>
+            </div>
+        }
+    </div>
+    <div class="mb-5">
+        <h4>Select the Destinations to connect.</h4>
+        @foreach (var destination in Model.DestinationList)
+        {
+            <div>
+                <label>
+                    <input type="checkbox" name="DestinationIds" value="@destination.DestinationID"
+                           @(Model.JourneyDestination.Any(D => D.DestinationID == destination.DestinationID) ? "checked" : "") />
+                    @destination.DestinationName
+                </label>
+            </div>
+        }
+    </div>
+    <div>
+        <input class="btn btn-light border border-1" type="submit" value="Update Journey" />
+    </div>
+</form>

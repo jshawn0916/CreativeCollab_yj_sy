@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
+using System.Web.UI.WebControls;
 
 namespace CreativeCollab_yj_sy.Controllers
 {
@@ -106,7 +107,7 @@ namespace CreativeCollab_yj_sy.Controllers
         {
             GetApplicationCookie();
 
-            // objective: add a new user into our system using the API
+            // objective: add a new Journey into our system using the API
             // curl https://localhost:44324/api/JourneyData/AddJourney
             string url = "JourneyData/AddJourney";
             string UserId = User.Identity.GetUserId();
@@ -125,7 +126,10 @@ namespace CreativeCollab_yj_sy.Controllers
                 JourneyDto createdJourney = jss.Deserialize<JourneyDto>(journeyData);
                 int createdJourneyId = createdJourney.JourneyID;
 
+                //objective: Create seleted Restaurants under the care of this Journey
+                //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}/{UserID}
                 url = "JourneyData/AssociateJourneyWithRestaurants/" + createdJourneyId + "/" + UserId;
+
                 jsonpayload = jss.Serialize(RestaurantIds);
                 content = new StringContent(jsonpayload);
                 content.Headers.ContentType.MediaType = "application/json";
@@ -133,6 +137,8 @@ namespace CreativeCollab_yj_sy.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
+                    //objective: Create seleted Destinations under the care of this Journey
+                    //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}/{UserID}
                     url = "JourneyData/AssociateJourneyWithDestinations/" + createdJourneyId + "/" + UserId;
                     jsonpayload = jss.Serialize(DestinationIds);
                     content = new StringContent(jsonpayload);
@@ -169,32 +175,183 @@ namespace CreativeCollab_yj_sy.Controllers
             DetailJourney ViewModel = new DetailJourney();
 
             //objective: communicate with our Journey data api to retrieve one Journey
-            //curl https://localhost:44324/api/JourneyData/FindJourney/{id}
+            //curl https://localhost:44324/api/JourneyData/FindJourney/{JourneyID}
 
             string url = "JourneyData/FindJourney/" + id;
             HttpResponseMessage response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             JourneyDto JourneyDto = response.Content.ReadAsAsync<JourneyDto>().Result;
 
             ViewModel.JourneyDto = JourneyDto;
 
-            //objective: communicate with our Journey data api to retrieve All Journey
-            //curl https://localhost:44324/api/RestaurantData/ListRestaurants
-            url = "RestaurantData/ListRestaurants/";
+            //objective: Show all Restaurants under the care of this Journey
+            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}/{UserID}
+            url = "RestaurantData/ListRestaurantsforJourney/" + id +"/" + JourneyDto.UserID;
             response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             IEnumerable<RestaurantDto> RestaurantList = response.Content.ReadAsAsync<IEnumerable<RestaurantDto>>().Result;
 
             ViewModel.RestaurantList = RestaurantList;
 
-            //objective: communicate with our Journey data api to retrieve All Journey
-            //curl https://localhost:44324/api/DestinationData/ListDestinations
-            url = "DestinationData/ListDestinations";
+            //objective: Show all Destinations under the care of this Journey
+            //curl https://localhost:44324/api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}
+            url = "DestinationData/ListDestinationsforJourney/" + id + "/" + JourneyDto.UserID;
             response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             IEnumerable<DestinationDto> DestinationList = response.Content.ReadAsAsync<IEnumerable<DestinationDto>>().Result;
 
             ViewModel.DestinationList = DestinationList;
 
 
             return View(ViewModel);
+        }
+
+        // GET: Journey/Edit/5
+        [Authorize(Roles = "Admin,Guest")]
+        public ActionResult Edit(int id)
+        {
+            EditJourney ViewModel = new EditJourney();
+
+            //objective: communicate with our user data api to retrieve one Journey
+            //curl https://localhost:44324/api/JourneyData/FindJourney/{JourneyID}
+
+            string url = "JourneyData/FindJourney/" + id;
+            HttpResponseMessage response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            JourneyDto SeletedJourney = response.Content.ReadAsAsync<JourneyDto>().Result;
+
+            ViewModel.SeletedJourney = SeletedJourney;
+
+            //objective: Show all Restaurants
+            //curl https://localhost:44324/api/RestaurantData/ListRestaurants
+            url = "RestaurantData/ListRestaurants";
+            response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            IEnumerable<RestaurantDto> RestaurantList = response.Content.ReadAsAsync<IEnumerable<RestaurantDto>>().Result;
+            ViewModel.RestaurantList = RestaurantList;
+
+            //objective: Show all Restaurants under the care of this Journey
+            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}/{UserID}
+            url = "RestaurantData/ListRestaurantsforJourney/" + id + "/" + SeletedJourney.UserID;
+            response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+            IEnumerable<RestaurantDto> JourneyRestaurant = response.Content.ReadAsAsync<IEnumerable<RestaurantDto>>().Result;
+            ViewModel.JourneyRestaurant = JourneyRestaurant;
+
+
+            //objective: Show all Destinations
+            //curl https://localhost:44324/api/DestinationData/ListDestinations
+            url = "DestinationData/ListDestinations";
+            response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            IEnumerable<DestinationDto> DestinationList = response.Content.ReadAsAsync<IEnumerable<DestinationDto>>().Result;
+
+            ViewModel.DestinationList = DestinationList;
+
+            //objective: Show all Destinations under the care of this Journey
+            //curl https://localhost:44324/api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}
+            
+            url = "DestinationData/ListDestinationsforJourney/" + id + "/" + SeletedJourney.UserID;
+            response = client.GetAsync(url).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            IEnumerable<DestinationDto> JourneyDestination = response.Content.ReadAsAsync<IEnumerable<DestinationDto>>().Result;
+
+            ViewModel.JourneyDestination = JourneyDestination;
+
+            return View(ViewModel);
+        }
+
+        //POST: Journey/Update/5
+        [HttpPost]
+        [Authorize(Roles = "Admin,Guest")]
+        public ActionResult Update(int id, Journey Journey, int[] RestaurantIds, int[] DestinationIds)
+        {
+            //objective: Update Journey
+            //curl https://localhost:44324/api/JourneyData/UpdateJourney/{JourneyID}
+            string url = "JourneyData/UpdateJourney/" + id;
+            Debug.WriteLine(url);
+            string jsonpayload = jss.Serialize(Journey);
+            HttpContent content = new StringContent(jsonpayload);
+            content.Headers.ContentType.MediaType = "application/json";
+            HttpResponseMessage response = client.PostAsync(url, content).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            string JourneyData = response.Content.ReadAsStringAsync().Result;
+            JourneyDto updateJourney = jss.Deserialize<JourneyDto>(JourneyData);
+            int updateJourneyId = updateJourney.JourneyID;
+            string updateJourneyUserId = updateJourney.UserID;
+
+            //objective: Delete all Restaurants under the care of this Journey
+            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}/{UserID}
+            url = "JourneyData/UnAssociateJourneyWithRestaurants/" + updateJourneyId + "/" + updateJourneyUserId;
+            response = client.PostAsync(url, null).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            //objective: Delete all Destinations under the care of this Journey
+            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}/{UserID}
+            url = "JourneyData/UnAssociateJourneyWithDestinations/" + updateJourneyId + "/" + updateJourneyUserId;
+            response = client.PostAsync(url, null).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            //objective: Create seleted Restaurants under the care of this Journey
+            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}/{UserID}
+            url = "JourneyData/AssociateJourneyWithRestaurants/" + updateJourneyId + "/" + updateJourneyUserId;
+            jsonpayload = jss.Serialize(RestaurantIds);
+            content = new StringContent(jsonpayload);
+            content.Headers.ContentType.MediaType = "application/json";
+            response = client.PostAsync(url, content).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            //objective: Create seleted Destinations under the care of this Journey
+            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}/{UserID}
+            url = "JourneyData/AssociateJourneyWithDestinations/" + updateJourneyId + "/" + updateJourneyUserId;
+            jsonpayload = jss.Serialize(DestinationIds);
+            content = new StringContent(jsonpayload);
+            content.Headers.ContentType.MediaType = "application/json";
+            response = client.PostAsync(url, content).Result;
+            if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
+
+            return RedirectToAction("Details/" + id);
+
+        }
+
+        // GET: Journey/DeleteConfirm/5
+        [Authorize(Roles = "Admin,Guest")]
+        public ActionResult DeleteConfirm(int id)
+        {
+            //objective: communicate with our user data api to retrieve one Journey
+            //curl https://localhost:44324/api/JourneyData/FindJourney/{id}
+            string url = "JourneyData/FindJourney/" + id;
+            HttpResponseMessage response = client.GetAsync(url).Result;
+
+            JourneyDto JourneyDto = response.Content.ReadAsAsync<JourneyDto>().Result;
+
+            return View(JourneyDto);
+        }
+
+        // POST: Journey/Delete/5
+        [HttpPost]
+        [Authorize(Roles = "Admin,Guest")]
+        public ActionResult Delete(int id)
+        {
+            string url = "JourneyData/DeleteJourney/" + id;
+            HttpContent content = new StringContent("");
+            content.Headers.ContentType.MediaType = "application/json";
+            HttpResponseMessage response = client.PostAsync(url, content).Result;
+
+            if (response.IsSuccessStatusCode)
+            {
+                int travelerId = response.Content.ReadAsAsync<int>().Result;
+                return RedirectToAction("List");
+            }
+            else
+            {
+                return RedirectToAction("Error");
+            }
         }
     }
 }

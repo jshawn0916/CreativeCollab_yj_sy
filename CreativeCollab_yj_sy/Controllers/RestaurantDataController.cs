@@ -12,6 +12,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using CreativeCollab_yj_sy.Models;
 using System.Diagnostics;
+using Microsoft.AspNet.Identity;
 
 namespace CreativeCollab_yj_sy.Controllers
 {
@@ -45,6 +46,46 @@ namespace CreativeCollab_yj_sy.Controllers
                 Rate = R.Rate,
                 Location = R.Location
             }));
+            return Ok(RestaurantDtos);
+        }
+
+        /// <summary>
+        /// Grthers informatioon about Restaurants related to a particular Journey
+        /// </summary>
+        /// <returns>
+        /// HEADER: 200(Ok)
+        /// CONTENT: Returns all Restaurants in a database associated with a particular Journey
+        /// </returns>
+        /// <example>
+        /// GET: api/RestaurantData/ListRestaurantsforJourney/4/2
+        /// </example>
+        [HttpGet]
+        [Route("api/RestaurantData/ListRestaurantsforJourney/{JourneyID}/{UserID}")]
+        [Authorize(Roles = "Admin,Guest")]
+        public IHttpActionResult ListRestaurantsforJourney(int JourneyID, string UserID)
+        {
+            //do not process if the (user is not an admin) and (the Journey does not belong to the user)
+            bool isAdmin = User.IsInRole("Admin");
+            //Forbidden() isn't a natively implemented status like BadRequest()
+            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+
+            //sending a query to the database
+            //select * from Restaurants...
+            List<Restaurant> Restaurants = db.Restaurants.Where(
+                R => R.Journeys.Any(J => J.JourneyID == JourneyID)).ToList();
+
+            List<RestaurantDto> RestaurantDtos = new List<RestaurantDto>();
+
+            Restaurants.ForEach(R => RestaurantDtos.Add(new RestaurantDto()
+            {
+                RestaurantID = R.RestaurantID,
+                RestaurantName = R.RestaurantName,
+                RestaurantDescription = R.RestaurantDescription,
+                Rate = R.Rate,
+                Location = R.Location,
+            }));
+
+            //push the results to the list of Restaurants to return
             return Ok(RestaurantDtos);
         }
 

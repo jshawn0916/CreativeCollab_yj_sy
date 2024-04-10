@@ -12,6 +12,7 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using CreativeCollab_yj_sy.Models;
 using System.Diagnostics;
+using Microsoft.AspNet.Identity;
 
 namespace CreativeCollab_yj_sy.Controllers
 {
@@ -44,6 +45,47 @@ namespace CreativeCollab_yj_sy.Controllers
                 DestinationDescription = D.DestinationDescription,
                 Location = D.Location
             }));
+            return Ok(DestinationDtos);
+        }
+
+        /// <summary>
+        /// Grthers informatioon about Destinations related to a particular Journey
+        /// </summary>
+        /// <returns>
+        /// HEADER: 200(Ok)
+        /// CONTENT: Returns all Destinations in a database associated with a particular Journey
+        /// </returns>
+        /// <example>
+        /// GET: api/DestinationData/ListDestinationsforJourney/4/2
+        /// </example>
+        [HttpGet]
+        [Route("api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}")]
+        [Authorize(Roles = "Admin,Guest")]
+        public IHttpActionResult ListDestinationsforJourney(int JourneyID, string UserID)
+        {
+            //do not process if the (user is not an admin) and (the Journey does not belong to the user)
+            bool isAdmin = User.IsInRole("Admin");
+            //Forbidden() isn't a natively implemented status like BadRequest()
+            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+
+            //sending a query to the database
+            //select * from Destinations...
+            List<Destination> Destinations = db.Destinations.Where(
+                D => D.Journeys.Any(
+                    J => J.JourneyID == JourneyID
+                )).ToList();
+
+            List<DestinationDto> DestinationDtos = new List<DestinationDto>();
+
+            Destinations.ForEach(D => DestinationDtos.Add(new DestinationDto()
+            {
+                DestinationID = D.DestinationID,
+                DestinationName = D.DestinationName,
+                DestinationDescription = D.DestinationDescription,
+                Location = D.Location
+            }));
+
+            //push the results to the list of Destinations to return
             return Ok(DestinationDtos);
         }
 

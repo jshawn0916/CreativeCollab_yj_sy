@@ -202,9 +202,14 @@ namespace CreativeCollab_yj_sy.Controllers
         /// POST api/JourneyData/UnAssociateJourneyWithRestaurants/9/1
         /// </example>
         [HttpPost]
-        [Route("api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}")]
-        public IHttpActionResult UnAssociateJourneyWithRestaurants(int JourneyID)
+        [Route("api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}/{UserID}")]
+        public IHttpActionResult UnAssociateJourneyWithRestaurants(int JourneyID, string UserID)
         {
+            //do not process if the (user is not an admin) and (the Journey does not belong to the user)
+            bool isAdmin = User.IsInRole("Admin");
+            //Forbidden() isn't a natively implemented status like BadRequest()
+            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+
             Journey SelectedJourney = db.Journeys.Include(J => J.Restaurants).Where(J => J.JourneyID == JourneyID).FirstOrDefault();
             if (SelectedJourney == null)
             {
@@ -290,8 +295,14 @@ namespace CreativeCollab_yj_sy.Controllers
         /// </example>
         [HttpPost]
         [Route("api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}/{UserID}")]
-        public IHttpActionResult UnAssociateJourneyWithDestinations(int JourneyID)
+        [Authorize(Roles = "Admin,Guest")]
+        public IHttpActionResult UnAssociateJourneyWithDestinations(int JourneyID, string UserID)
         {
+            //do not process if the (user is not an admin) and (the Journey does not belong to the user)
+            bool isAdmin = User.IsInRole("Admin");
+            //Forbidden() isn't a natively implemented status like BadRequest()
+            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+
             Journey SelectedJourney = db.Journeys.Include(J => J.Destinations).Where(J => J.JourneyID == JourneyID).FirstOrDefault();
             if (SelectedJourney == null)
             {
@@ -327,8 +338,12 @@ namespace CreativeCollab_yj_sy.Controllers
         /// </example>
         [ResponseType(typeof(void))]
         [HttpPost]
+        [Authorize(Roles = "Admin,Guest")]
         public IHttpActionResult UpdateJourney(int id, Journey Journey)
         {
+            Debug.WriteLine("1111111");
+            Debug.WriteLine(id);
+            Debug.WriteLine(Journey.JourneyID);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -337,7 +352,7 @@ namespace CreativeCollab_yj_sy.Controllers
             {
                 return BadRequest();
             }
-
+            Debug.WriteLine("22222222");
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
@@ -346,7 +361,7 @@ namespace CreativeCollab_yj_sy.Controllers
                 Debug.WriteLine("not allowed. Journey user" + Journey.UserID + " user " + User.Identity.GetUserId());
                 return StatusCode(HttpStatusCode.Forbidden);
             }
-
+            Debug.WriteLine("333333");
             db.Entry(Journey).State = EntityState.Modified;
             //do not modify the attached user id on update
             db.Entry(Journey).Property(J => J.UserID).IsModified = false;
