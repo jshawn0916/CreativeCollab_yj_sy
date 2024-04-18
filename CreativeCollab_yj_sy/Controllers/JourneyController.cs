@@ -127,8 +127,8 @@ namespace CreativeCollab_yj_sy.Controllers
                 int createdJourneyId = createdJourney.JourneyID;
 
                 //objective: Create seleted Restaurants under the care of this Journey
-                //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}/{UserID}
-                url = "JourneyData/AssociateJourneyWithRestaurants/" + createdJourneyId + "/" + UserId;
+                //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}
+                url = "JourneyData/AssociateJourneyWithRestaurants/" + createdJourneyId;
 
                 jsonpayload = jss.Serialize(RestaurantIds);
                 content = new StringContent(jsonpayload);
@@ -138,8 +138,8 @@ namespace CreativeCollab_yj_sy.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     //objective: Create seleted Destinations under the care of this Journey
-                    //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}/{UserID}
-                    url = "JourneyData/AssociateJourneyWithDestinations/" + createdJourneyId + "/" + UserId;
+                    //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}
+                    url = "JourneyData/AssociateJourneyWithDestinations/" + createdJourneyId;
                     jsonpayload = jss.Serialize(DestinationIds);
                     content = new StringContent(jsonpayload);
                     content.Headers.ContentType.MediaType = "application/json";
@@ -185,8 +185,8 @@ namespace CreativeCollab_yj_sy.Controllers
             ViewModel.JourneyDto = JourneyDto;
 
             //objective: Show all Restaurants under the care of this Journey
-            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}/{UserID}
-            url = "RestaurantData/ListRestaurantsforJourney/" + id +"/" + JourneyDto.UserID;
+            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}
+            url = "RestaurantData/ListRestaurantsforJourney/" + id;
             response = client.GetAsync(url).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             IEnumerable<RestaurantDto> RestaurantList = response.Content.ReadAsAsync<IEnumerable<RestaurantDto>>().Result;
@@ -195,7 +195,7 @@ namespace CreativeCollab_yj_sy.Controllers
 
             //objective: Show all Destinations under the care of this Journey
             //curl https://localhost:44324/api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}
-            url = "DestinationData/ListDestinationsforJourney/" + id + "/" + JourneyDto.UserID;
+            url = "DestinationData/ListDestinationsforJourney/" + id;
             response = client.GetAsync(url).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             IEnumerable<DestinationDto> DestinationList = response.Content.ReadAsAsync<IEnumerable<DestinationDto>>().Result;
@@ -233,8 +233,8 @@ namespace CreativeCollab_yj_sy.Controllers
             ViewModel.RestaurantList = RestaurantList;
 
             //objective: Show all Restaurants under the care of this Journey
-            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}/{UserID}
-            url = "RestaurantData/ListRestaurantsforJourney/" + id + "/" + SeletedJourney.UserID;
+            //curl https://localhost:44324/api/RestaurantData/ListRestaurantsforJourney/{JourneyID}
+            url = "RestaurantData/ListRestaurantsforJourney/" + id;
             response = client.GetAsync(url).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
             IEnumerable<RestaurantDto> JourneyRestaurant = response.Content.ReadAsAsync<IEnumerable<RestaurantDto>>().Result;
@@ -252,9 +252,9 @@ namespace CreativeCollab_yj_sy.Controllers
             ViewModel.DestinationList = DestinationList;
 
             //objective: Show all Destinations under the care of this Journey
-            //curl https://localhost:44324/api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}
+            //curl https://localhost:44324/api/DestinationData/ListDestinationsforJourney/{JourneyID}
             
-            url = "DestinationData/ListDestinationsforJourney/" + id + "/" + SeletedJourney.UserID;
+            url = "DestinationData/ListDestinationsforJourney/" + id;
             response = client.GetAsync(url).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
 
@@ -283,23 +283,22 @@ namespace CreativeCollab_yj_sy.Controllers
             string JourneyData = response.Content.ReadAsStringAsync().Result;
             JourneyDto updateJourney = jss.Deserialize<JourneyDto>(JourneyData);
             int updateJourneyId = updateJourney.JourneyID;
-            string updateJourneyUserId = updateJourney.UserID;
 
             //objective: Delete all Restaurants under the care of this Journey
-            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}/{UserID}
-            url = "JourneyData/UnAssociateJourneyWithRestaurants/" + updateJourneyId + "/" + updateJourneyUserId;
+            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}
+            url = "JourneyData/UnAssociateJourneyWithRestaurants/" + updateJourneyId;
             response = client.PostAsync(url, null).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
 
             //objective: Delete all Destinations under the care of this Journey
-            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}/{UserID}
-            url = "JourneyData/UnAssociateJourneyWithDestinations/" + updateJourneyId + "/" + updateJourneyUserId;
+            //curl https://localhost:44324/api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}
+            url = "JourneyData/UnAssociateJourneyWithDestinations/" + updateJourneyId;
             response = client.PostAsync(url, null).Result;
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
 
             //objective: Create seleted Restaurants under the care of this Journey
-            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}/{UserID}
-            url = "JourneyData/AssociateJourneyWithRestaurants/" + updateJourneyId + "/" + updateJourneyUserId;
+            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}
+            url = "JourneyData/AssociateJourneyWithRestaurants/" + updateJourneyId;
             jsonpayload = jss.Serialize(RestaurantIds);
             content = new StringContent(jsonpayload);
             content.Headers.ContentType.MediaType = "application/json";
@@ -307,8 +306,8 @@ namespace CreativeCollab_yj_sy.Controllers
             if (!response.IsSuccessStatusCode) return RedirectToAction("Error");
 
             //objective: Create seleted Destinations under the care of this Journey
-            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}/{UserID}
-            url = "JourneyData/AssociateJourneyWithDestinations/" + updateJourneyId + "/" + updateJourneyUserId;
+            //curl https://localhost:44324/api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}
+            url = "JourneyData/AssociateJourneyWithDestinations/" + updateJourneyId;
             jsonpayload = jss.Serialize(DestinationIds);
             content = new StringContent(jsonpayload);
             content.Headers.ContentType.MediaType = "application/json";

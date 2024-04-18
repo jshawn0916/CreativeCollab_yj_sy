@@ -139,7 +139,6 @@ namespace CreativeCollab_yj_sy.Controllers
         /// Associates a particular Journey with a particular Restaurants
         /// </summary>
         /// <param name="JourneyID">The JourneyID primary key</param>
-        /// <param name="UserID">UserID of JourneyID</param>
         /// <returns>
         /// HEADER: 200 (OK)
         /// CONTENT: Restaurantids
@@ -147,19 +146,24 @@ namespace CreativeCollab_yj_sy.Controllers
         /// HEADER: 404 (NOT FOUND)
         /// </returns>
         /// <example>
-        /// POST api/JourneyData/AssociateJourneyWithRestaurants/1/2
+        /// POST api/JourneyData/AssociateJourneyWithRestaurants/1
         /// </example>
         [HttpPost]
-        [Route("api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}/{UserID}")]
+        [Route("api/JourneyData/AssociateJourneyWithRestaurants/{JourneyID}")]
         [Authorize(Roles = "Admin,Guest")]
-        public IHttpActionResult AssociateJourneyWithRestaurants(int JourneyID, string UserID, [FromBody] int[] Restaurantids)
+        public IHttpActionResult AssociateJourneyWithRestaurants(int JourneyID, [FromBody] int[] Restaurantids)
         {
+            Journey Journey = db.Journeys.Find(JourneyID);
+            if (Journey == null)
+            {
+                return NotFound();
+            }
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
-            if (!isAdmin && (UserID != User.Identity.GetUserId()))
+            if (!isAdmin && (Journey.UserID != User.Identity.GetUserId()))
             {
-                Debug.WriteLine("not allowed. Journey user" + UserID + " user " + User.Identity.GetUserId());
+                Debug.WriteLine("not allowed. Journey user" + Journey.UserID + " user " + User.Identity.GetUserId());
                 return StatusCode(HttpStatusCode.Forbidden);
             }
 
@@ -199,16 +203,21 @@ namespace CreativeCollab_yj_sy.Controllers
         /// HEADER: 404 (NOT FOUND)
         /// </returns>
         /// <example>
-        /// POST api/JourneyData/UnAssociateJourneyWithRestaurants/9/1
+        /// POST api/JourneyData/UnAssociateJourneyWithRestaurants/9
         /// </example>
         [HttpPost]
-        [Route("api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}/{UserID}")]
-        public IHttpActionResult UnAssociateJourneyWithRestaurants(int JourneyID, string UserID)
+        [Route("api/JourneyData/UnAssociateJourneyWithRestaurants/{JourneyID}")]
+        public IHttpActionResult UnAssociateJourneyWithRestaurants(int JourneyID)
         {
+            Journey Journey = db.Journeys.Find(JourneyID);
+            if (Journey == null)
+            {
+                return NotFound();
+            }
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
-            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+            if (!isAdmin && (Journey.UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
 
             Journey SelectedJourney = db.Journeys.Include(J => J.Restaurants).Where(J => J.JourneyID == JourneyID).FirstOrDefault();
             if (SelectedJourney == null)
@@ -230,7 +239,6 @@ namespace CreativeCollab_yj_sy.Controllers
         /// Associates a particular Journey with a particular Destinations
         /// </summary>
         /// <param name="JourneyID">The JourneyID primary key</param>
-        /// <param name="UserID">UserID of JourneyID</param>
         /// <returns>
         /// HEADER: 200 (OK)
         /// CONTENT: Destinationids
@@ -238,19 +246,24 @@ namespace CreativeCollab_yj_sy.Controllers
         /// HEADER: 404 (NOT FOUND)
         /// </returns>
         /// <example>
-        /// POST api/JourneyData/AssociateJourneyWithDestinations/1/2
+        /// POST api/JourneyData/AssociateJourneyWithDestinations/1
         /// </example>
         [HttpPost]
-        [Route("api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}/{UserID}")]
+        [Route("api/JourneyData/AssociateJourneyWithDestinations/{JourneyID}")]
         [Authorize(Roles = "Admin,Guest")]
-        public IHttpActionResult AssociateJourneyWithDestinations(int JourneyID, string UserID, [FromBody] int[] Destinationids)
+        public IHttpActionResult AssociateJourneyWithDestinations(int JourneyID, [FromBody] int[] Destinationids)
         {
+            Journey Journey = db.Journeys.Find(JourneyID);
+            if (Journey == null)
+            {
+                return NotFound();
+            }
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
-            if (!isAdmin && (UserID != User.Identity.GetUserId()))
+            if (!isAdmin && (Journey.UserID != User.Identity.GetUserId()))
             {
-                Debug.WriteLine("not allowed. Journey user" + UserID + " user " + User.Identity.GetUserId());
+                Debug.WriteLine("not allowed. Journey user" + Journey.UserID + " user " + User.Identity.GetUserId());
                 return StatusCode(HttpStatusCode.Forbidden);
             }
 
@@ -294,14 +307,19 @@ namespace CreativeCollab_yj_sy.Controllers
         /// POST api/JourneyData/UnAssociateJourneyWithDestinations/1/2
         /// </example>
         [HttpPost]
-        [Route("api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}/{UserID}")]
+        [Route("api/JourneyData/UnAssociateJourneyWithDestinations/{JourneyID}")]
         [Authorize(Roles = "Admin,Guest")]
-        public IHttpActionResult UnAssociateJourneyWithDestinations(int JourneyID, string UserID)
+        public IHttpActionResult UnAssociateJourneyWithDestinations(int JourneyID)
         {
+            Journey Journey = db.Journeys.Find(JourneyID);
+            if (Journey == null)
+            {
+                return NotFound();
+            }
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
-            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+            if (!isAdmin && (Journey.UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
 
             Journey SelectedJourney = db.Journeys.Include(J => J.Destinations).Where(J => J.JourneyID == JourneyID).FirstOrDefault();
             if (SelectedJourney == null)

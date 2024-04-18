@@ -56,17 +56,22 @@ namespace CreativeCollab_yj_sy.Controllers
         /// CONTENT: Returns all Destinations in a database associated with a particular Journey
         /// </returns>
         /// <example>
-        /// GET: api/DestinationData/ListDestinationsforJourney/4/2
+        /// GET: api/DestinationData/ListDestinationsforJourney/4
         /// </example>
         [HttpGet]
-        [Route("api/DestinationData/ListDestinationsforJourney/{JourneyID}/{UserID}")]
+        [Route("api/DestinationData/ListDestinationsforJourney/{JourneyID}")]
         [Authorize(Roles = "Admin,Guest")]
-        public IHttpActionResult ListDestinationsforJourney(int JourneyID, string UserID)
+        public IHttpActionResult ListDestinationsforJourney(int JourneyID)
         {
+            Journey Journey = db.Journeys.Find(JourneyID);
+            if (Journey == null)
+            {
+                return NotFound();
+            }
             //do not process if the (user is not an admin) and (the Journey does not belong to the user)
             bool isAdmin = User.IsInRole("Admin");
             //Forbidden() isn't a natively implemented status like BadRequest()
-            if (!isAdmin && (UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
+            if (!isAdmin && (Journey.UserID != User.Identity.GetUserId())) return StatusCode(HttpStatusCode.Forbidden);
 
             //sending a query to the database
             //select * from Destinations...
