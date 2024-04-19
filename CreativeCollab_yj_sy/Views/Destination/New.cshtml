@@ -7,8 +7,8 @@
     <div class="mb-2">
         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Name:</label> <input type="text" name="DestinationName" />
     </div>
-    <div class="mb-2">
-        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Location:</label> <input type="text" name="Location" />
+    <div class="mb-2"> 
+        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Location:</label> <button type="button" id="show-modal">Show Map</button><input type="text" id="address-input" name="Location" readonly />
     </div>
     <div class="mb-5">
         <label style="display: block; margin-bottom: 8px; font-weight: bold;">Description:</label> <textarea name="DestinationDescription"></textarea>
@@ -17,3 +17,97 @@
         <input class="btn btn-light border border-1" type="submit" value="Create Destination" />
     </div>
 </form>
+
+<div id="myModal" class="modal">
+    <div class="modal-content">
+        <input id="search-input" type="text" placeholder="Search for address...">
+        <div id="map"></div>
+        <p id="selected-address">Selected address: None</p>
+        <button id="confirm">Confirm</button>
+    </div>
+</div>
+
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUKMoIRffFCq8SWq4kiNIR9bHBYMl3jmY&callback=initMap&libraries=places&language=en"></script>
+<script>
+let map;
+let searchBox;
+let markers = [];
+
+function initMap() {
+    const mapCenter = {lat: 43.65107, lng: -79.347015}; // Initial map center
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: mapCenter,
+        zoom: 13
+    });
+
+    const input = document.getElementById("search-input");
+    searchBox = new google.maps.places.SearchBox(input);
+    map.addListener("bounds_changed", () => {
+        searchBox.setBounds(map.getBounds());
+    });
+
+    searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+
+        if (places.length == 0) {
+            return;
+        }
+
+        // Remove existing markers.
+        markers.forEach((marker) => {
+            marker.setMap(null);
+        });
+        markers = [];
+
+        // Add markers to the map and adjust the map bounds based on search results.
+        const bounds = new google.maps.LatLngBounds();
+        places.forEach((place) => {
+            if (!place.geometry || !place.geometry.location) {
+                console.log("Returned place contains no geometry");
+                return;
+            }
+
+            const marker = new google.maps.Marker({
+                map,
+                title: place.name,
+                position: place.geometry.location
+            });
+
+            markers.push(marker);
+
+            marker.addListener('click', () => {
+                document.getElementById('selected-address').innerText = "Selected address: " + place.formatted_address;
+            });
+
+            if (place.geometry.viewport) {
+                bounds.union(place.geometry.viewport);
+            } else {
+                bounds.extend(place.geometry.location);
+            }
+        });
+        map.fitBounds(bounds);
+    });
+}
+
+// Modal control code
+const modal = document.getElementById("myModal");
+const btn = document.getElementById("show-modal");
+const confirmBtn = document.getElementById("confirm");
+
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+confirmBtn.onclick = function() {
+    modal.style.display = "none";
+    const selectedAddress = document.getElementById('selected-address').innerText.replace("Selected address: ", "");
+    document.getElementById('address-input').value = selectedAddress; // Input the address into the initially empty input field
+}
+
+// Close the modal when clicked outside of it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
