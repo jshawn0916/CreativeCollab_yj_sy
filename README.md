@@ -62,7 +62,7 @@ We have designed a system that allows users to create and manage their own Journ
 
 #### Bridge Table: JourneyDestinations
 - Establishes a many-to-many relationship between Destinations and Journeys
-- 
+  
 ### Table Relationships
 - Users to Journeys: 1 to Many
 - Restaurants to Journeys: Many to Many
